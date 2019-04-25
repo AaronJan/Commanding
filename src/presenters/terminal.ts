@@ -28,12 +28,20 @@ export class TerminalPresenter implements Presenter {
     return this.colorEnabled ? (colorizer ? colorizer(str) : str) : str;
   }
 
+  protected getExecutableRendering(executable: string): string {
+    return executable;
+  }
+
+  protected getCommandNameRendering(name: string): string {
+    return this.colorizeIfEnabled(`${name}`, chalk.yellow);
+  }
+
   protected getRequiredArgNameRendering(name: string): string {
     return this.colorizeIfEnabled(`<${name}>`, chalk.blue);
   }
 
   protected getOptionalArgNameRendering(name: string): string {
-    return this.colorizeIfEnabled(`[${name}]`, chalk.yellow);
+    return this.colorizeIfEnabled(`[${name}]`, chalk.greenBright);
   }
 
   protected getArgNameRendering(argRequirement: ArgRequirement): string {
@@ -52,12 +60,20 @@ export class TerminalPresenter implements Presenter {
       .join(' ');
   }
 
-  protected getUsageExampleWithArgsRendering(name: string, argRequirements: ArgRequirement[]): string {
-    return `  ${name} ${this.getUsageArgRequirementsRendering(argRequirements)}`;
+  protected getUsageExampleRendering(
+    executable: string,
+    argRequirements: ArgRequirement[],
+    command?: Command
+  ): string {
+    const prefix = command ?
+      `${this.getExecutableRendering(executable)} ${this.getCommandNameRendering(command.getName())}` :
+      this.getExecutableRendering(executable);
+
+    return `  ${prefix} ${this.getUsageArgRequirementsRendering(argRequirements)}`;
   }
 
   protected getUsageExampleWithCommandRendering(name: string): string {
-    return `  ${name} ${this.getRequiredArgNameRendering('command')}`;
+    return `  ${name} ${this.getCommandNameRendering('<command>')}`;
   }
 
   protected getRequiredRendering(required: boolean): string {
@@ -90,7 +106,7 @@ export class TerminalPresenter implements Presenter {
 
   protected getCommandRequirementsRendering(commands: Command[]): string {
     const table = commands.map(command => ([
-      `${this.colorizeIfEnabled(command.getName())} ${this.getUsageArgRequirementsRendering(command.getArgRequirements())}`,
+      `${this.getCommandNameRendering(command.getName())} ${this.getUsageArgRequirementsRendering(command.getArgRequirements())}`,
       this.colorizeIfEnabled(_.defaultTo(command.getDescrption(), '')),
     ]));
 
@@ -109,10 +125,74 @@ export class TerminalPresenter implements Presenter {
     return this.colorizeIfEnabled(version);
   }
 
-  renderApplication(
+  protected getCommandArgumentsSectionRendering(command: Command): string {
+    let lines: string[] = [];
+
+    lines.push(this.getSectionNameRendering(`ARGUMENTS`));
+    lines.push(``);
+    lines.push(marginLeft(
+      this.getArgRequirementsRendering(command.getArgRequirements()),
+      2
+    ));
+    lines.push(``);
+
+    return lines.join(TerminalPresenter.NEW_LINE_CHAR);
+  }
+
+  protected getCommandOptionsSectionRendering(command: Command): string {
+    let lines: string[] = [];
+
+    lines.push(this.getSectionNameRendering(`OPTIONS`));
+    lines.push(``);
+    lines.push(marginLeft(
+      this.getOptionRequirementsRendering(command.getOptionRequirements()),
+      2
+    ));
+    lines.push(``);
+
+    return lines.join(TerminalPresenter.NEW_LINE_CHAR);
+  }
+
+  renderApplicationUsage(
     executable: string,
     commands: Command[],
     defaultCommand?: Command,
+  ) {
+    let lines = [''];
+
+    lines.push(this.getSectionNameRendering(`USAGE`));
+    lines.push(``);
+    let usageShowed = false;
+    if (defaultCommand) {
+      lines.push(this.getUsageExampleRendering(executable, defaultCommand.getArgRequirements()));
+      usageShowed = true;
+    }
+    if (commands.length > 0) {
+      lines.push(this.getUsageExampleWithCommandRendering(executable));
+      usageShowed = true;
+    }
+    if (usageShowed === false) {
+      lines.push(this.getUsageExampleRendering(executable, []));
+    }
+    lines.push(``);
+
+    if (defaultCommand) {
+      // Arguments section.
+      if (defaultCommand.getArgRequirements().length > 0) {
+        lines.push(this.getCommandArgumentsSectionRendering(defaultCommand));
+      }
+
+      // Options section.
+      if (defaultCommand.getOptionRequirements().length > 0) {
+        lines.push(this.getCommandOptionsSectionRendering(defaultCommand));
+      }
+    }
+
+    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
+  }
+
+  renderApplicationInfo(
+    executable: string,
     name?: string | undefined,
     description?: string | undefined,
     version?: string | undefined
@@ -123,45 +203,9 @@ export class TerminalPresenter implements Presenter {
     lines.push(`${this.getApplicationNameRendering(mainName)} ${this.getApplicationVersionRendering(_.defaultTo(version, ''))} `);
     lines.push(``);
 
-    // Usage section.
-    lines.push(this.getSectionNameRendering(`USAGE`));
-    lines.push(``);
-    let usageShowed = false;
-    if (defaultCommand) {
-      lines.push(this.getUsageExampleWithArgsRendering(mainName, defaultCommand.getArgRequirements()));
-      usageShowed = true;
-    }
-    if (commands.length > 0) {
-      lines.push(this.getUsageExampleWithCommandRendering(mainName));
-      usageShowed = true;
-    }
-    if (usageShowed === false) {
-      lines.push(this.getUsageExampleWithArgsRendering(mainName, []));
-    }
-    lines.push(``);
-
-    if (defaultCommand) {
-      // Arguments section.
-      if (defaultCommand.getArgRequirements().length > 0) {
-        lines.push(this.getSectionNameRendering(`ARGUMENTS`));
-        lines.push(``);
-        lines.push(marginLeft(
-          this.getArgRequirementsRendering(defaultCommand.getArgRequirements()),
-          2
-        ));
-        lines.push(``);
-      }
-
-      // Options section.
-      if (defaultCommand.getOptionRequirements().length > 0) {
-        lines.push(this.getSectionNameRendering(`OPTIONS`));
-        lines.push(``);
-        lines.push(marginLeft(
-          this.getOptionRequirementsRendering(defaultCommand.getOptionRequirements()),
-          2
-        ));
-        lines.push(``);
-      }
+    if (description) {
+      lines.push(`  ${this.colorizeIfEnabled(description, chalk.gray)}`);
+      lines.push(``);
     }
 
     this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
@@ -183,8 +227,26 @@ export class TerminalPresenter implements Presenter {
     this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
-  renderCommandHelp(executable: string, command?: Command | undefined) {
-    // TODO:
+  renderCommandHelp(executable: string, command: Command) {
+    let lines = [''];
+
+    // Usage section.
+    lines.push(this.getSectionNameRendering(`USAGE`));
+    lines.push(``);
+    lines.push(this.getUsageExampleRendering(executable, command.getArgRequirements(), command));
+    lines.push(``);
+
+    // Arguments section.
+    if (command.getArgRequirements().length > 0) {
+      lines.push(this.getCommandArgumentsSectionRendering(command));
+    }
+
+    // Options section.
+    if (command.getOptionRequirements().length > 0) {
+      lines.push(this.getCommandOptionsSectionRendering(command));
+    }
+
+    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
   renderGlobalOptions(globalOptionRequirements: OptionRequirement[]) {

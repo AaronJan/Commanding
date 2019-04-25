@@ -14,6 +14,9 @@ import { parseArgv, extractExecutableNameFromArgv, mapOptions } from './helpers/
 import { TerminalLogger } from './loggers/terminal';
 import { LogLevel } from './loggers/constant';
 import { TerminalPresenter } from './presenters/terminal';
+import { MissingArgument } from './errors/MissingArgument';
+import { MissingOption } from './errors/MissingOption';
+import { SanitizationError } from './errors/SanitizationError';
 
 const GLOBAL_OPTION_REQUIREMENTS: OptionRequirement[] = [
   {
@@ -73,10 +76,6 @@ export class Application implements ApplicationInterface {
     this.commandMap = _.keyBy(commands, command => command.getName());
   }
 
-  protected hasCommand() {
-    return this.commands.length !== 0 || this.defaultCommand !== undefined;
-  }
-
   protected hasSubCommand(): boolean {
     return this.commands.length !== 0;
   }
@@ -105,6 +104,19 @@ export class Application implements ApplicationInterface {
     return mapOptions(parsedOptions, this.getGlobalOptionRequirements());
   }
 
+  protected containHelpCommand(parsedArgs: ParsedArgs): boolean {
+    if (parsedArgs.length !== 2) {
+      return false;
+    }
+
+    const [instruction, commandName] = parsedArgs;
+    if (instruction !== 'help') {
+      return false;
+    }
+
+    return this.matchCommand(commandName) !== undefined;
+  }
+
   execute(
     executable: string,
     parsedArgs: ParsedArgs,
@@ -127,11 +139,16 @@ export class Application implements ApplicationInterface {
 
     // Matching sub-command first.
     if (this.hasSubCommand() && parsedArgs.length > 0) {
+      if (this.containHelpCommand(parsedArgs)) {
+        const command = <Command>this.matchCommand(parsedArgs[1]);
+        return this.showCommandHelp(executable, command, presenter);
+      }
+
       const commandName = <string>_.first(parsedArgs);
       const command = this.matchCommand(commandName);
 
       if (command !== undefined) {
-        if (this.shouldShowHelp(parsedArgs.slice(1), globalOptions)) {
+        if (this.shouldShowCommandHelp(parsedArgs.slice(1), globalOptions)) {
           return this.showCommandHelp(executable, command, presenter);
         }
 
@@ -140,8 +157,8 @@ export class Application implements ApplicationInterface {
     }
 
     if (
-      this.shouldShowHelp(parsedArgs, globalOptions) === false &&
-      this.defaultCommand
+      this.shouldShowCommandHelp(parsedArgs, globalOptions) === false
+      && this.defaultCommand
     ) {
       return this.defaultCommand.execute(parsedArgs, parsedOptions, presenter, logger);
     }
@@ -171,22 +188,26 @@ export class Application implements ApplicationInterface {
     } catch (err) {
       presenter.renderError(err instanceof Error ? err.message : `${err}`);
 
-      return this.showHelp(executable, presenter);
+      if (
+        err instanceof MissingArgument
+        || err instanceof MissingOption
+        || err instanceof SanitizationError
+      ) {
+        this.showHelp(executable, presenter);
+      }
     }
   }
 
-  renderApplication(executable: string, presenter: Presenter): void {
-    presenter.renderApplication(
+  renderApplicationInfo(executable: string, presenter: Presenter): void {
+    presenter.renderApplicationInfo(
       executable,
-      this.commands,
-      this.defaultCommand,
       this.name,
       this.description,
       this.version
     );
   }
 
-  protected shouldShowHelp(parsedArgs: ParsedArgs, globalOptions: MappedOptions): boolean {
+  protected shouldShowCommandHelp(parsedArgs: ParsedArgs, globalOptions: MappedOptions): boolean {
     if (parsedArgs.length > 0) {
       return false;
     }
@@ -195,19 +216,21 @@ export class Application implements ApplicationInterface {
   }
 
   showHelp(executable: string, presenter: Presenter): void {
-    this.renderApplication(executable, presenter);
-
+    this.renderApplicationInfo(executable, presenter);
+    presenter.renderApplicationUsage(
+      executable,
+      this.commands,
+      this.defaultCommand,
+    );
     presenter.renderCommandList(this.commands);
-
     presenter.renderGlobalOptions(this.getGlobalOptionRequirements());
-
     presenter.renderEnding();
   }
 
   showCommandHelp(executable: string, command: Command, presenter: Presenter): void {
-    this.renderApplication(executable, presenter);
-
+    this.renderApplicationInfo(executable, presenter);
     command.showHelp(executable, presenter);
+    presenter.renderGlobalOptions(this.getGlobalOptionRequirements());
   }
 
   showVersion(presenter: Presenter): void {

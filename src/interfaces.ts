@@ -62,13 +62,17 @@ export interface Presenter {
 
   setColor(enable: boolean): void;
 
-  renderApplication(
+  renderApplicationInfo(
     executable: string,
-    commands: Command[],
-    defaultCommand?: Command,
     name?: string,
     description?: string,
     version?: string
+  ): void;
+
+  renderApplicationUsage(
+    executable: string,
+    commands: Command[],
+    defaultCommand?: Command,
   ): void;
 
   renderCommandList(commands: Command[]): void;
