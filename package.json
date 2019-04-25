@@ -1,0 +1,37 @@
+{
+  "name": "commanding",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "test": "npx jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AaronJan/Commanding.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "AaronJan",
+    "url": "https://github.com/AaronJan"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/AaronJan/Commanding/issues"
+  },
+  "homepage": "https://github.com/AaronJan/Commanding#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/lodash": "^4.14.123",
+    "@types/node": "^11.13.7",
+    "jest": "^24.7.1",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "chalk": "2.*",
+    "lodash": "4.*"
+  }
+}
