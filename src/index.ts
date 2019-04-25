@@ -22,7 +22,7 @@ export function gether(
 }
 
 export function solo(
-  defaultCommand?: CommandInterface,
+  defaultCommand: CommandInterface,
   applicationInfo?: ApplicationInfo,
 ) {
   return new Application(
