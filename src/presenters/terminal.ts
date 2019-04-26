@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import _ from 'lodash';
 
 import { Presenter, Command, ArgRequirement, OptionRequirement } from '../interfaces';
-import { alignColumns, marginLeft } from '../helpers/align';
+import { alignColumns, marginLeft } from '../helpers/cli';
 
 export class TerminalPresenter implements Presenter {
   protected colorEnabled = true;
