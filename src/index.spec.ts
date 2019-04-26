@@ -77,12 +77,4 @@ describe('command', () => {
     expect(Command).toBeCalledWith(name);
     expect(command).toBeInstanceOf(Command);
   });
-
-  it('should create a Command with default name when name is not provided', () => {
-    const command = index.command();
-
-    expect(Command).toHaveBeenCalledTimes(1);
-    expect(Command).toBeCalledWith('default');
-    expect(command).toBeInstanceOf(Command);
-  });
 });
