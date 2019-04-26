@@ -1,10 +1,11 @@
 {
   "name": "commanding",
   "version": "0.1.0",
-  "description": "",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "description": "A simple yet practical command-Line application framework, written in TypeScript.",
+  "main": "index.js",
+  "typings": "index.d.ts",
   "scripts": {
+    "build": "node scripts/build.js",
     "test": "npx jest",
     "test:cov": "npx jest --coverage"
   },
@@ -12,7 +13,12 @@
     "type": "git",
     "url": "git+https://github.com/AaronJan/Commanding.git"
   },
-  "keywords": [],
+  "keywords": [
+    "CLI",
+    "commandline",
+    "Command Line",
+    "Command-Line"
+  ],
   "author": {
     "name": "AaronJan",
     "url": "https://github.com/AaronJan"

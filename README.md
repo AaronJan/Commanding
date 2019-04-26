@@ -131,6 +131,8 @@ gether(
 
 Heavily inspired by [`Caporal`](https://github.com/mattallty/Caporal.js).
 
+Build script from [`RxJS`](https://github.com/ReactiveX/rxjs).
+
 
 ## License
 
