@@ -17,18 +17,30 @@ describe('isEndWithQuote', () => {
   });
 });
 
-
 describe('parseOptionString', () => {
   it('shoud parse flag option correctly', () => {
     expect(parser.parseOptionStr('--flag')).toEqual(['--flag', true]);
   });
 
-  it('should parse name and value correctly', () => {
+  it('should parse shorthand name and value correctly', () => {
+    expect(parser.parseOptionStr('-s value')).toEqual(['-s', 'value']);
+    expect(parser.parseOptionStr('-s')).toEqual(['-s', true]);
+    expect(parser.parseOptionStr('-s=value')).toEqual(['-s', 'value']);
+  });
+
+  it('should parse longhand name and value correctly', () => {
     expect(parser.parseOptionStr('--key=value')).toEqual(['--key', 'value']);
+    expect(parser.parseOptionStr('--key=val---ue')).toEqual(['--key', 'val---ue']);
+    expect(parser.parseOptionStr('--key===value')).toEqual(['--key', '==value']);
+    expect(parser.parseOptionStr('--keyval---ue')).toEqual(['--keyval---ue', true]);
   });
 
   it('should parse number as string', () => {
     expect(parser.parseOptionStr('-123 321')).toEqual(['-123', '321']);
+  });
+
+  it('should throw when option is invalid', () => {
+    expect(() => parser.parseOptionStr('123')).toThrow(InvalidInput);
   });
 });
 
@@ -92,12 +104,12 @@ describe('mapOptions', () => {
     };
     const optionRequirements: OptionRequirement[] = [
       {
-        fullName: '-e, --enable-color',
+        sign: '-e, --enable-color',
         shorthand: '-e',
         longhand: '--enable-color',
         required: true,
-        isCsv: false,
-        isRepeatable: false,
+        csv: false,
+        repeatable: false,
       },
     ];
 
@@ -115,11 +127,11 @@ describe('mapOptions', () => {
     };
     const optionRequirements: OptionRequirement[] = [
       {
-        fullName: '--names',
+        sign: '--names',
         longhand: '--names',
         required: true,
-        isCsv: true,
-        isRepeatable: false,
+        csv: true,
+        repeatable: false,
       },
     ];
 
@@ -142,12 +154,12 @@ describe('mapOptions', () => {
     };
     const optionRequirements: OptionRequirement[] = [
       {
-        fullName: '-n, --names',
+        sign: '-n, --names',
         shorthand: '-n',
         longhand: '--names',
         required: true,
-        isCsv: false,
-        isRepeatable: true,
+        csv: false,
+        repeatable: true,
       },
     ];
 
@@ -174,12 +186,12 @@ describe('mapOptions', () => {
     };
     const optionRequirements: OptionRequirement[] = [
       {
-        fullName: '-n, --names',
+        sign: '-n, --names',
         shorthand: '-n',
         longhand: '--names',
         required: true,
-        isCsv: true,
-        isRepeatable: true,
+        csv: true,
+        repeatable: true,
       },
     ];
 
@@ -213,11 +225,11 @@ describe('mapOptions', () => {
     };
     const optionRequirements: OptionRequirement[] = [
       {
-        fullName: '--colors',
+        sign: '--colors',
         longhand: '--colors',
         required: true,
-        isCsv: true,
-        isRepeatable: false,
+        csv: true,
+        repeatable: false,
       },
     ];
 
@@ -337,4 +349,3 @@ describe('normalizeOptionNames', () => {
     });
   });
 });
-

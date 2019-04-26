@@ -37,7 +37,7 @@ export const isEndWithQuote = _.flow([
 ]);
 
 export function parseOptionStr(option: string): [string, string | boolean] {
-  const matched = /^(--?[^-= ][^= ]*?)(?:(?:=| )([^-= ]+)?)?$/i.exec(option);
+  const matched = /^(--?[^-= ][^= ]*?)(?:(?:=| )(.+)?)?$/i.exec(option);
   if (matched === null) {
     throw new InvalidInput(`Invalid options "${option}"`);
   }
