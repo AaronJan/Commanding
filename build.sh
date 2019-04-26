@@ -35,6 +35,6 @@ select decision in "yes" "no"; do
   cd ../
 
   read -p "Ready to push to upstream. [Enter] to continue"
-  git push upstream
-  git push upstream --tags
+  git push
+  git push --tags
 done
