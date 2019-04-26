@@ -1,4 +1,4 @@
-import * as align from './align';
+import * as cli from './cli';
 import chalk from 'chalk';
 
 describe('rotateArrayBy90', () => {
@@ -9,7 +9,7 @@ describe('rotateArrayBy90', () => {
       [7, 8, 9],
     ];
 
-    expect(align.rotateArrayBy90(arrays)).toEqual([
+    expect(cli.rotateArrayBy90(arrays)).toEqual([
       [7, 4, 1],
       [8, 5, 2],
       [9, 6, 3],
@@ -23,7 +23,7 @@ describe('rotateArrayBy90', () => {
       [7],
     ];
 
-    expect(align.rotateArrayBy90(arrays)).toEqual([
+    expect(cli.rotateArrayBy90(arrays)).toEqual([
       [7, 4, 1],
       [undefined, 5, 2],
       [undefined, undefined, 3],
@@ -37,7 +37,7 @@ describe('rotateArrayBy90', () => {
       [7],
     ];
 
-    expect(align.rotateArrayBy90(arrays)).toEqual([
+    expect(cli.rotateArrayBy90(arrays)).toEqual([
       [7, 4, 1],
       [undefined, 5],
       [undefined, 6],
@@ -59,7 +59,7 @@ describe('alignColumns', () => {
     ]
     .join("\n");
 
-    expect(align.alignColumns(arrays, 2)).toEqual(expectContent);
+    expect(cli.alignColumns(arrays, 2)).toEqual(expectContent);
   });
 
   it('should strip color', () => {
@@ -75,7 +75,7 @@ describe('alignColumns', () => {
     ]
       .join("\n");
 
-    expect(align.alignColumns(arrays, 2)).toEqual(expectContent);
+    expect(cli.alignColumns(arrays, 2)).toEqual(expectContent);
   });
 });
 
@@ -87,7 +87,7 @@ describe('marginLeft', () => {
       'Line 3',
     ].join("\n");
 
-    expect(align.marginLeft(content, 0)).toBe(content);
+    expect(cli.marginLeft(content, 0)).toBe(content);
   });
 
   it('should add margin correctly', () => {
@@ -102,7 +102,7 @@ describe('marginLeft', () => {
       '  Line 3',
     ].join("\n");
 
-    expect(align.marginLeft(content, 2)).toBe(expectContent);
+    expect(cli.marginLeft(content, 2)).toBe(expectContent);
   });
 
   it('should support custom chars', () => {
@@ -117,6 +117,6 @@ describe('marginLeft', () => {
       '---Line 3',
     ].join("\r\n");
 
-    expect(align.marginLeft(content, 3, '-', "\r\n")).toBe(expectContent);
+    expect(cli.marginLeft(content, 3, '-', "\r\n")).toBe(expectContent);
   });
 });
