@@ -18,8 +18,6 @@ import { InvalidInput } from '../errors/InvalidInput';
 import { MissingOption } from '../errors/MissingOption';
 import { FakeSanitizer } from '../sanitizers/fake';
 import { MissingArgument } from '../errors/MissingArgument';
-import { Z_FULL_FLUSH } from 'zlib';
-import { stringLiteral } from '@babel/types';
 
 const SINGLE_QUOTE = '\'';
 const DOUBLE_QUOTE = '"';
@@ -38,10 +36,8 @@ export const isEndWithQuote = _.flow([
   ]),
 ]);
 
-
-
 export function parseOptionStr(option: string): [string, string | boolean] {
-  const matched = /^(--?[^-= ]+)(?:(?:=| )([^-= ]+)?)?$/i.exec(option);
+  const matched = /^(--?[^-= ][^= ].*?)(?:(?:=| )([^-= ]+)?)?$/i.exec(option);
   if (matched === null) {
     throw new InvalidInput(`Invalid options "${option}"`);
   }
