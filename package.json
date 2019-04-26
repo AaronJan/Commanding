@@ -1,6 +1,6 @@
 {
   "name": "commanding",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A simple yet practical command-Line application framework, written in TypeScript.",
   "main": "index.js",
   "typings": "index.d.ts",
