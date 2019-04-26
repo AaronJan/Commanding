@@ -52,9 +52,9 @@ export class Command implements CommandInterface {
     const requirement: ArgRequirement = {
       name,
       position: this.currentArgPosition,
-      required: _.defaultTo(details.required, true),
+      required: _.defaultTo(details.required, false),
       description: _.defaultTo(details.description, undefined),
-      defaultValue: _.defaultTo(details.defaultValue, undefined),
+      defaultValue: _.defaultTo(details.default, undefined),
       sanitizer: _.defaultTo(details.sanitizer, undefined),
     };
     this.argRequirements.push(requirement);
@@ -69,14 +69,15 @@ export class Command implements CommandInterface {
     const normalizedNames = normalizeOptionNames(fullName);
 
     const requirement: OptionRequirement = {
-      fullName: normalizedNames.fullName,
+      sign: normalizedNames.fullName,
       shorthand: normalizedNames.shorthand,
       longhand: normalizedNames.longhand,
-      isCsv: _.defaultTo(details.csv, false),
-      isRepeatable: _.defaultTo(details.repeatable, false),
-      required: _.defaultTo(details.required, true),
+      name: _.get(details, 'name'),
+      csv: _.defaultTo(details.csv, false),
+      repeatable: _.defaultTo(details.repeatable, false),
+      required: _.defaultTo(details.required, false),
       description: _.defaultTo(details.description, undefined),
-      defaultValue: _.defaultTo(details.defaultValue, undefined),
+      defaultValue: _.defaultTo(details.default, undefined),
       sanitizer: _.defaultTo(details.sanitizer, undefined),
     };
     this.optionRequirements.push(requirement);

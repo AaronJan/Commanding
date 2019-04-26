@@ -37,7 +37,7 @@ export const isEndWithQuote = _.flow([
 ]);
 
 export function parseOptionStr(option: string): [string, string | boolean] {
-  const matched = /^(--?[^-= ][^= ].*?)(?:(?:=| )([^-= ]+)?)?$/i.exec(option);
+  const matched = /^(--?[^-= ][^= ]*?)(?:(?:=| )([^-= ]+)?)?$/i.exec(option);
   if (matched === null) {
     throw new InvalidInput(`Invalid options "${option}"`);
   }
@@ -91,7 +91,7 @@ export function makeSplitAndSanitizeFunc(isCsv: boolean, optionSanitizer?: Sanit
 
   const splitAndSanitize = (parsedOptionValue: ParsedOptionValue) => {
     if (isCsv) {
-      return splitCsvStr(parsedOptionValue).map(sanitizer.sanitize);
+      return splitCsvStr(parsedOptionValue).map(value => sanitizer.sanitize(value));
     }
 
     return sanitizer.sanitize(parsedOptionValue);
@@ -148,7 +148,7 @@ export function mapOptions(parsedOptions: ParsedOptions, optionRequirements: Opt
         (requirement.longhand ? _.get(parsedOptions, requirement.longhand, []) : []),
       );
 
-      let parsedOptionValue: ParsedOptionValue | ParsedOptionValue[] | undefined = requirement.isRepeatable ?
+      let parsedOptionValue: ParsedOptionValue | ParsedOptionValue[] | undefined = requirement.repeatable ?
         mergeParsedOptionContentValues(mergedContents) :
         getLatestValueFromParsedOptionContents(mergedContents);
 
@@ -162,7 +162,7 @@ export function mapOptions(parsedOptions: ParsedOptions, optionRequirements: Opt
         }
       }
 
-      let mappedOptionValue = makeSplitAndSanitizeFunc(requirement.isCsv, requirement.sanitizer)(parsedOptionValue);
+      let mappedOptionValue = makeSplitAndSanitizeFunc(requirement.csv, requirement.sanitizer)(parsedOptionValue);
 
       return [
         requirement,

@@ -1,6 +1,6 @@
-jest.mock('./presenter/terminal');
+jest.mock('./presenters/awesome-terminal');
 
-import { TerminalPresenter } from './presenters/terminal';
+import { AwesomeTerminalPresenter } from './presenters/awesome-terminal';
 import * as application from './application';
 
 describe('parse', () => {
@@ -8,4 +8,3 @@ describe('parse', () => {
 
   });
 });
-

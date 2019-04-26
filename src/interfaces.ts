@@ -37,19 +37,24 @@ export interface ArgRequirement {
 }
 
 export interface OptionRequirement {
-  fullName: string,
+  sign: string,
   shorthand?: string;
   longhand?: string;
+  name?: string,
   description?: string;
   defaultValue?: MappedOptionValue;
   required: boolean,
-  isCsv: boolean,
-  isRepeatable: boolean,
+  csv: boolean,
+  repeatable: boolean,
   sanitizer?: Sanitizer,
 }
 
+export interface SanitizeOptions {
+  [name: string]: any,
+}
+
 export interface Sanitizer {
-  sanitize<T, R>(value: T): R;
+  sanitize(value: any): any;
 }
 
 export interface ApplicationInfo {
@@ -125,14 +130,15 @@ export interface Application {
 export interface ArgDetails {
   required?: boolean,
   description?: string,
-  defaultValue?: MappedArgValue,
+  default?: MappedArgValue,
   sanitizer?: Sanitizer,
 }
 
 export interface OptionDetails {
+  name?: string,
   required?: boolean,
   description?: string,
-  defaultValue?: MappedOptionValue,
+  default?: MappedOptionValue,
   repeatable?: boolean,
   csv?: boolean,
   sanitizer?: Sanitizer,

@@ -1,9 +1,9 @@
 import { Sanitizer, SanitizeOptions } from '../interfaces';
 
-export class FakeSanitizer implements Sanitizer {
+export class BooleanSanitizer implements Sanitizer {
   constructor(protected options?: SanitizeOptions) { }
 
   sanitize(value: any) {
-    return value;
+    return Boolean(value);
   }
 }

@@ -45,6 +45,7 @@ describe('parseArgv', () => {
       '--key3=value3',
       '--key3 value4',
       'command3',
+      '--key-with-dash',
     ])).toEqual([
       [
         'command1',
@@ -58,6 +59,7 @@ describe('parseArgv', () => {
         '--key1': [{ order: 3, value: 'value1' }],
         '-k': [{ order: 4, value: 'value2' }],
         '--key3': [{ order: 5, value: 'value3' }, { order: 6, value: 'value4' }],
+        '--key-with-dash': [{order: 7, value: true}],
       },
     ]);
   });

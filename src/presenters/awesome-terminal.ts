@@ -1,10 +1,15 @@
 import chalk from 'chalk';
 import _ from 'lodash';
 
-import { Presenter, Command, ArgRequirement, OptionRequirement } from '../interfaces';
+import {
+  Presenter,
+  Command,
+  ArgRequirement,
+  OptionRequirement,
+} from '../interfaces';
 import { alignColumns, marginLeft } from '../helpers/cli';
 
-export class TerminalPresenter implements Presenter {
+export class AwesomeTerminalPresenter implements Presenter {
   protected colorEnabled = true;
 
   static readonly TABLE_PADDING = 6;
@@ -51,7 +56,14 @@ export class TerminalPresenter implements Presenter {
   }
 
   protected getOptionNameRendering(requirement: OptionRequirement): string {
-    return this.colorizeIfEnabled(requirement.fullName, chalk.green);
+    const strs: string[] = [
+      this.colorizeIfEnabled(requirement.sign, chalk.green)
+    ];
+    if (requirement.name) {
+      strs.push(this.colorizeIfEnabled(`<${requirement.name}>`, chalk.blueBright));
+    }
+
+    return strs.join(' ');
   }
 
   protected getUsageArgRequirementsRendering(argRequirements: ArgRequirement[]): string {
@@ -91,7 +103,7 @@ export class TerminalPresenter implements Presenter {
       this.getRequiredRendering(requirement.required),
     ]));
 
-    return alignColumns(table, TerminalPresenter.TABLE_PADDING);
+    return alignColumns(table, AwesomeTerminalPresenter.TABLE_PADDING);
   }
 
   protected getOptionRequirementsRendering(requirements: OptionRequirement[]): string {
@@ -101,7 +113,7 @@ export class TerminalPresenter implements Presenter {
       this.getRequiredRendering(requirement.required),
     ]));
 
-    return alignColumns(table, TerminalPresenter.TABLE_PADDING);
+    return alignColumns(table, AwesomeTerminalPresenter.TABLE_PADDING);
   }
 
   protected getCommandRequirementsRendering(commands: Command[]): string {
@@ -110,7 +122,7 @@ export class TerminalPresenter implements Presenter {
       this.colorizeIfEnabled(_.defaultTo(command.getDescrption(), '')),
     ]));
 
-    return alignColumns(table, TerminalPresenter.TABLE_PADDING);
+    return alignColumns(table, AwesomeTerminalPresenter.TABLE_PADDING);
   }
 
   getSectionNameRendering(name: string): string {
@@ -136,7 +148,7 @@ export class TerminalPresenter implements Presenter {
     ));
     lines.push(``);
 
-    return lines.join(TerminalPresenter.NEW_LINE_CHAR);
+    return lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR);
   }
 
   protected getCommandOptionsSectionRendering(command: Command): string {
@@ -150,7 +162,7 @@ export class TerminalPresenter implements Presenter {
     ));
     lines.push(``);
 
-    return lines.join(TerminalPresenter.NEW_LINE_CHAR);
+    return lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR);
   }
 
   renderApplicationUsage(
@@ -188,7 +200,7 @@ export class TerminalPresenter implements Presenter {
       }
     }
 
-    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
   renderApplicationInfo(
@@ -208,7 +220,7 @@ export class TerminalPresenter implements Presenter {
       lines.push(``);
     }
 
-    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
   renderCommandList(commands: Command[]) {
@@ -224,7 +236,7 @@ export class TerminalPresenter implements Presenter {
       lines.push(``);
     }
 
-    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
   renderCommandHelp(executable: string, command: Command) {
@@ -246,7 +258,7 @@ export class TerminalPresenter implements Presenter {
       lines.push(this.getCommandOptionsSectionRendering(command));
     }
 
-    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
   renderGlobalOptions(globalOptionRequirements: OptionRequirement[]) {
@@ -260,7 +272,7 @@ export class TerminalPresenter implements Presenter {
     ));
     lines.push(``);
 
-    this.writeWithLeftMargin(lines.join(TerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
   }
 
   renderVersion(version?: string) {
@@ -270,14 +282,14 @@ export class TerminalPresenter implements Presenter {
   }
 
   renderEnding() {
-    this.write(TerminalPresenter.NEW_LINE_CHAR);
+    this.write(AwesomeTerminalPresenter.NEW_LINE_CHAR);
   }
 
   renderError(message: string) {
-    this.write(`${this.colorizeIfEnabled(message, chalk.redBright)}${TerminalPresenter.NEW_LINE_CHAR}`);
+    this.write(`${this.colorizeIfEnabled(message, chalk.redBright)}${AwesomeTerminalPresenter.NEW_LINE_CHAR}`);
   }
 
   renderSplit() {
-    this.write(TerminalPresenter.NEW_LINE_CHAR);
+    this.write(AwesomeTerminalPresenter.NEW_LINE_CHAR);
   }
 } 

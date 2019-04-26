@@ -6,6 +6,7 @@ import {
 } from './interfaces';
 import { Application } from './application';
 import { Command } from './command';
+import { SanitizerMaker } from './sanitizer-maker';
 
 export function gether(
   commands: CommandInterface[],
@@ -34,6 +35,10 @@ export function solo(
   );
 }
 
-export function command(name?: string) {
-  return new Command(name ? name : 'default');
+export function command(name: string) {
+  return new Command(name);
+}
+
+export function sanitize() {
+  return new SanitizerMaker();
 }

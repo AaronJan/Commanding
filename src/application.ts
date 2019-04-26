@@ -13,53 +13,54 @@ import {
 import { parseArgv, extractExecutableNameFromArgv, mapOptions } from './helpers/parser';
 import { TerminalLogger } from './loggers/terminal';
 import { LogLevel } from './loggers/constant';
-import { TerminalPresenter } from './presenters/terminal';
+import { AwesomeTerminalPresenter } from './presenters/awesome-terminal';
 import { MissingArgument } from './errors/MissingArgument';
 import { MissingOption } from './errors/MissingOption';
 import { SanitizationError } from './errors/SanitizationError';
+import { CommandNotFound } from './errors/CommandNotFound';
 
 const GLOBAL_OPTION_REQUIREMENTS: OptionRequirement[] = [
   {
-    fullName: '-h, --help',
+    sign: '-h, --help',
     shorthand: '-h',
     longhand: '--help',
     description: 'Display help',
     required: false,
-    isRepeatable: false,
-    isCsv: false,
+    repeatable: false,
+    csv: false,
   },
   {
-    fullName: '-V, --version',
+    sign: '-V, --version',
     shorthand: '-V',
     longhand: '--version',
     description: 'Display version',
     required: false,
-    isRepeatable: false,
-    isCsv: false,
+    repeatable: false,
+    csv: false,
   },
   {
-    fullName: '--no-color',
+    sign: '--no-color',
     longhand: '--no-color',
     description: 'Disable colors',
     required: false,
-    isRepeatable: false,
-    isCsv: false,
+    repeatable: false,
+    csv: false,
   },
   {
-    fullName: '--quiet',
+    sign: '--quiet',
     longhand: '--quiet',
     description: 'Quiet mode - only displays `warn` and `error` level messages',
     required: false,
-    isRepeatable: false,
-    isCsv: false,
+    repeatable: false,
+    csv: false,
   },
   {
-    fullName: '-v, --verbose',
+    sign: '-v, --verbose',
     longhand: '--verbose',
     description: 'Verbose mode - displays `debug` level messages',
     required: false,
-    isRepeatable: false,
-    isCsv: false,
+    repeatable: false,
+    csv: false,
   },
 ];
 
@@ -93,7 +94,7 @@ export class Application implements ApplicationInterface {
   }
 
   protected makeDefaultPresenter(): Presenter {
-    return new TerminalPresenter();
+    return new AwesomeTerminalPresenter();
   }
 
   protected makeDefaultLogger(): Logger {
@@ -154,17 +155,28 @@ export class Application implements ApplicationInterface {
 
         return command.execute(parsedArgs.slice(1), parsedOptions, presenter, logger);
       }
+
+      // If Application do not have a default Command, It means user typed wrong
+      // Command name.
+      if (!this.defaultCommand) {
+        throw new CommandNotFound(commandName);
+      }
     }
 
-    if (
-      this.shouldShowCommandHelp(parsedArgs, globalOptions) === false
-      && this.defaultCommand
-    ) {
+    // Global help, version
+    if (parsedArgs.length === 0) {
+      if (globalOptions['--version']) {
+        return this.showVersion(presenter);
+      }
+
+      if (globalOptions['--help']) {
+        return this.showHelp(executable, presenter);
+      }
+    }
+
+    // Default Command
+    if (this.defaultCommand) {
       return this.defaultCommand.execute(parsedArgs, parsedOptions, presenter, logger);
-    }
-
-    if (globalOptions['--version']) {
-      return this.showVersion(presenter);
     }
 
     return this.showHelp(executable, presenter);
@@ -192,6 +204,7 @@ export class Application implements ApplicationInterface {
         err instanceof MissingArgument
         || err instanceof MissingOption
         || err instanceof SanitizationError
+        || err instanceof CommandNotFound
       ) {
         this.showHelp(executable, presenter);
       }
