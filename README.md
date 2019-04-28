@@ -10,6 +10,7 @@ A simple yet practical command-Line application framework, written in TypeScript
 * Written in TypeScript (easier to development & mantain, nicer to TypeScript developers)
 * Less mutable state (long chaining API calls is an old design pattern)
 * Decoupled (you can customize it, e.g.: write your own Sanitizer or change output themes)
+* Promise Based
 
 ## Installation
 
@@ -54,10 +55,12 @@ solo(
             repeatable: true,
             description: 'You can apply multiple filter on your video by just using `--filter=[preset]` multiple times',
         })
-        .handle((args, options) => {
+        .handle(async (args, options) => {
             console.log(args['folder']);
             console.log(options['-s']);
             console.log(options['--source']);
+
+            return;
         }),
     // You can provide some infomations about your application
     {
@@ -66,7 +69,10 @@ solo(
         description: 'Check this out mate.',
     }
 )
-    .parse(process.argv);
+    .parse(process.argv)
+    .then(() => {
+        console.log('Promise based!');
+    });
 
 ```
 
@@ -92,7 +98,7 @@ gether(
                 description: 'The URL you want to download from',
                 required: true,
             })
-            .handle((args, options) => {
+            .handle(async (args, options) => {
                 // Command logic
             }),
         command('upload')
@@ -101,13 +107,13 @@ gether(
                 description: 'The URL you want to upload to',
                 required: true,
             })
-            .handle((args, options) => {
+            .handle(async (args, options) => {
                 // Command logic
             }),
     ],
     // Default command:
     command('default')
-        .handle((args, options) => {
+        .handle((async args, options) => {
             // Command logic
         }),
     {

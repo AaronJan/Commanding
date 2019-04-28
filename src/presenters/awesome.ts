@@ -9,16 +9,17 @@ import {
 } from '../interfaces';
 import { alignColumns, marginLeft } from '../helpers/cli';
 
-export class AwesomeTerminalPresenter implements Presenter {
-  protected colorEnabled = true;
-
+export class AwesomePresenter implements Presenter {
   static readonly TABLE_PADDING = 6;
   static readonly NEW_LINE_CHAR = "\n";
 
-  constructor() { }
+  constructor(
+    protected colorEnabled = true,
+    protected output: NodeJS.WriteStream = process.stdout,
+  ) { }
 
   protected write(content: string) {
-    process.stdout.write(content);
+    this.output.write(content);
   }
 
   protected writeWithLeftMargin(content: string, margin: number) {
@@ -103,7 +104,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       this.getRequiredRendering(requirement.required),
     ]));
 
-    return alignColumns(table, AwesomeTerminalPresenter.TABLE_PADDING);
+    return alignColumns(table, AwesomePresenter.TABLE_PADDING);
   }
 
   protected getOptionRequirementsRendering(requirements: OptionRequirement[]): string {
@@ -113,7 +114,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       this.getRequiredRendering(requirement.required),
     ]));
 
-    return alignColumns(table, AwesomeTerminalPresenter.TABLE_PADDING);
+    return alignColumns(table, AwesomePresenter.TABLE_PADDING);
   }
 
   protected getCommandRequirementsRendering(commands: Command[]): string {
@@ -122,7 +123,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       this.colorizeIfEnabled(_.defaultTo(command.getDescrption(), '')),
     ]));
 
-    return alignColumns(table, AwesomeTerminalPresenter.TABLE_PADDING);
+    return alignColumns(table, AwesomePresenter.TABLE_PADDING);
   }
 
   getSectionNameRendering(name: string): string {
@@ -148,7 +149,7 @@ export class AwesomeTerminalPresenter implements Presenter {
     ));
     lines.push(``);
 
-    return lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR);
+    return lines.join(AwesomePresenter.NEW_LINE_CHAR);
   }
 
   protected getCommandOptionsSectionRendering(command: Command): string {
@@ -162,7 +163,7 @@ export class AwesomeTerminalPresenter implements Presenter {
     ));
     lines.push(``);
 
-    return lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR);
+    return lines.join(AwesomePresenter.NEW_LINE_CHAR);
   }
 
   renderApplicationUsage(
@@ -200,7 +201,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       }
     }
 
-    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomePresenter.NEW_LINE_CHAR), 2);
   }
 
   renderApplicationInfo(
@@ -220,7 +221,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       lines.push(``);
     }
 
-    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomePresenter.NEW_LINE_CHAR), 2);
   }
 
   renderCommandList(commands: Command[]) {
@@ -236,7 +237,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       lines.push(``);
     }
 
-    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomePresenter.NEW_LINE_CHAR), 2);
   }
 
   renderCommandHelp(executable: string, command: Command) {
@@ -258,7 +259,7 @@ export class AwesomeTerminalPresenter implements Presenter {
       lines.push(this.getCommandOptionsSectionRendering(command));
     }
 
-    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomePresenter.NEW_LINE_CHAR), 2);
   }
 
   renderGlobalOptions(globalOptionRequirements: OptionRequirement[]) {
@@ -272,7 +273,7 @@ export class AwesomeTerminalPresenter implements Presenter {
     ));
     lines.push(``);
 
-    this.writeWithLeftMargin(lines.join(AwesomeTerminalPresenter.NEW_LINE_CHAR), 2);
+    this.writeWithLeftMargin(lines.join(AwesomePresenter.NEW_LINE_CHAR), 2);
   }
 
   renderVersion(version?: string) {
@@ -282,14 +283,14 @@ export class AwesomeTerminalPresenter implements Presenter {
   }
 
   renderEnding() {
-    this.write(AwesomeTerminalPresenter.NEW_LINE_CHAR);
+    this.write(AwesomePresenter.NEW_LINE_CHAR);
   }
 
   renderError(message: string) {
-    this.write(`${this.colorizeIfEnabled(message, chalk.redBright)}${AwesomeTerminalPresenter.NEW_LINE_CHAR}`);
+    this.write(`${this.colorizeIfEnabled(message, chalk.redBright)}${AwesomePresenter.NEW_LINE_CHAR}`);
   }
 
   renderSplit() {
-    this.write(AwesomeTerminalPresenter.NEW_LINE_CHAR);
+    this.write(AwesomePresenter.NEW_LINE_CHAR);
   }
 } 

@@ -105,12 +105,12 @@ export interface Logger {
 
   warn(message: string): void;
 
-  error(message: string): void;
+  error(message: string, trace?: string): void;
 }
 
 export interface Application {
 
-  parse(args: InputArgv, presenter: Presenter): void;
+  parse(args: InputArgv, presenter: Presenter): Promise<void>;
 
   execute(
     executable: string,
@@ -118,7 +118,7 @@ export interface Application {
     parsedOptions: ParsedOptions,
     presenter: Presenter,
     logger: Logger
-  ): void;
+  ): Promise<void>;
 
   showHelp(executable: string, presenter: Presenter): void;
 
@@ -145,7 +145,7 @@ export interface OptionDetails {
 }
 
 export interface CommandHandler {
-  (args: MappedArgs, options: MappedOptions, logger: Logger): void;
+  (args: MappedArgs, options: MappedOptions, logger: Logger): Promise<void>;
 }
 
 export interface Command {
@@ -166,7 +166,7 @@ export interface Command {
 
   getOptionRequirements(): OptionRequirement[];
 
-  execute(args: ParsedArgs, options: ParsedOptions, presenter: Presenter, logger: Logger): void;
+  execute(args: ParsedArgs, options: ParsedOptions, presenter: Presenter, logger: Logger): Promise<void>;
 
   showHelp(executable: string, presenter: Presenter): void;
 }

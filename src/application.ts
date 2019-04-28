@@ -11,9 +11,9 @@ import {
   ParsedArgs,
 } from './interfaces';
 import { parseArgv, extractExecutableNameFromArgv, mapOptions } from './helpers/parser';
-import { TerminalLogger } from './loggers/terminal';
+import { NotFancyLogger } from './loggers/not-fancy';
 import { LogLevel } from './loggers/constant';
-import { AwesomeTerminalPresenter } from './presenters/awesome-terminal';
+import { AwesomePresenter } from './presenters/awesome';
 import { MissingArgument } from './errors/MissingArgument';
 import { MissingOption } from './errors/MissingOption';
 import { SanitizationError } from './errors/SanitizationError';
@@ -93,12 +93,22 @@ export class Application implements ApplicationInterface {
     return GLOBAL_OPTION_REQUIREMENTS;
   }
 
-  protected makeDefaultPresenter(): Presenter {
-    return new AwesomeTerminalPresenter();
+  makeDefaultPresenter(colorEnabled = true, output: NodeJS.WriteStream = process.stdout): Presenter {
+    return new AwesomePresenter(colorEnabled, output);
   }
 
-  protected makeDefaultLogger(): Logger {
-    return new TerminalLogger(LogLevel.INFO);
+  makeDefaultLogger(
+    level = LogLevel.INFO,
+    colorEnabled = true,
+    standardOutput: NodeJS.WriteStream = process.stdout,
+    errorOutput: NodeJS.WriteStream = process.stderr,
+  ): Logger {
+    return new NotFancyLogger(
+      level,
+      colorEnabled,
+      standardOutput,
+      errorOutput,
+    );
   }
 
   protected getGlobalOptions(parsedOptions: ParsedOptions): MappedOptions {
@@ -118,7 +128,7 @@ export class Application implements ApplicationInterface {
     return this.matchCommand(commandName) !== undefined;
   }
 
-  execute(
+  async execute(
     executable: string,
     parsedArgs: ParsedArgs,
     parsedOptions: ParsedOptions,
@@ -153,7 +163,7 @@ export class Application implements ApplicationInterface {
           return this.showCommandHelp(executable, command, presenter);
         }
 
-        return command.execute(parsedArgs.slice(1), parsedOptions, presenter, logger);
+        return await command.execute(parsedArgs.slice(1), parsedOptions, presenter, logger);
       }
 
       // If Application do not have a default Command, It means user typed wrong
@@ -176,13 +186,13 @@ export class Application implements ApplicationInterface {
 
     // Default Command
     if (this.defaultCommand) {
-      return this.defaultCommand.execute(parsedArgs, parsedOptions, presenter, logger);
+      return await this.defaultCommand.execute(parsedArgs, parsedOptions, presenter, logger);
     }
 
     return this.showHelp(executable, presenter);
   }
 
-  parse(argv: string[], customPresenter?: Presenter, customLogger?: Logger) {
+  async parse(argv: string[], customPresenter?: Presenter, customLogger?: Logger) {
     const presenter = customPresenter ? customPresenter : this.makeDefaultPresenter();
     const logger = customLogger ? customLogger : this.makeDefaultLogger();
     const executable = extractExecutableNameFromArgv(argv);
@@ -190,7 +200,7 @@ export class Application implements ApplicationInterface {
     try {
       const [parsedArgs, parsedOptions] = parseArgv(argv.slice(2));
 
-      this.execute(
+      return await this.execute(
         executable,
         parsedArgs,
         parsedOptions,

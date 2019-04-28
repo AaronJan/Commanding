@@ -34,7 +34,7 @@ export class Command implements CommandInterface {
 
   description(description: string) {
     this.commandDescription = description;
-    
+
     return this;
   }
 
@@ -99,7 +99,7 @@ export class Command implements CommandInterface {
     return this.commandName;
   }
 
-  execute(parsedArgs: string[], parsedOptions: ParsedOptions, presenter: Presenter, logger: Logger): void {
+  async execute(parsedArgs: string[], parsedOptions: ParsedOptions, presenter: Presenter, logger: Logger): Promise<void> {
     const mappedArgs = mapArguments(parsedArgs, this.argRequirements);
     const mappedOptions = mapOptions(parsedOptions, this.optionRequirements);
 
@@ -107,7 +107,7 @@ export class Command implements CommandInterface {
       throw new CommandHasNoHandler(this);
     }
 
-    this.handler(mappedArgs, mappedOptions, logger);
+    return await this.handler(mappedArgs, mappedOptions, logger);
   }
 
   showHelp(executable: string, presenter: Presenter): void {
