@@ -39,6 +39,6 @@
   },
   "dependencies": {
     "chalk": "2.*",
-    "lodash": "4.*"
+    "lodash": "^4.17.11"
   }
 }
